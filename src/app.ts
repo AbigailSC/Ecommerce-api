@@ -7,6 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import cookieParser from 'cookie-parser';
 import limitter from 'express-rate-limit';
+import helmet from 'helmet';
 
 import { swaggerDefinition, connection, config } from '@config';
 import { indexRoutes } from '@routes';
@@ -24,6 +25,7 @@ app.set('port', config.app.port);
 
 const whiteList = [config.app.originUrl];
 
+app.use(helmet());
 app.use(
   cors({
     origin: function (origin, cb) {

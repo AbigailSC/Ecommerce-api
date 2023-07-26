@@ -19,9 +19,43 @@
       "npm run lint:fix"
     ]
   },
-  "keywords": [],
-  "author": "Poro",
+  "keywords": [
+    "node",
+    "node.js",
+    "typescript",
+    "express",
+    "rest",
+    "api",
+    "mongodb",
+    "mongoose",
+    "es6",
+    "prettier"
+  ],
+  "author": {
+    "name": "Abigail Sarzuri",
+    "email": "Abigailsarzuri@gmail.com",
+    "url": "https://github.com/AbigailSC"
+  },
   "license": "ISC",
+  "repository": "git+https://github.com/AbigailSC/Ecommerce-api",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cron": "^2.3.0",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "mime-types": "^2.1.35",
+    "multer": "^1.4.4",
+    "nodemailer": "^6.9.1",
+    "swagger-jsdoc": "6.2.8",
+    "swagger-ui-express": "4.6.2",
+    "uuid": "^9.0.0",
+    "winston": "^3.9.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.19.3",
@@ -34,6 +68,7 @@
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
+    "@types/helmet": "^4.0.0",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/morgan": "^1.9.3",
     "@types/node": "^18.7.23",
@@ -59,22 +94,5 @@
     "prettier": "^2.7.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.8.4"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "bcrypt": "^5.1.0",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "cron": "^2.3.0",
-    "dotenv": "^16.0.2",
-    "express": "^4.18.1",
-    "jsonwebtoken": "^9.0.0",
-    "mime-types": "^2.1.35",
-    "multer": "^1.4.4",
-    "nodemailer": "^6.9.1",
-    "swagger-jsdoc": "6.2.8",
-    "swagger-ui-express": "4.6.2",
-    "uuid": "^9.0.0",
-    "winston": "^3.9.0"
   }
 }
