@@ -1,0 +1,110 @@
+[
+  {
+    "_id": "000000000000000000000010",
+    "name": "Autos, Motos y Otros"
+  },
+  {
+    "_id": "000000000000000000000011",
+    "name": "Celulares y Teléfonos"
+  },
+  {
+    "_id": "000000000000000000000012",
+    "name": "Computación"
+  },
+  {
+    "_id": "000000000000000000000013",
+    "name": "Electrónica, Audio y Video"
+  },
+  {
+    "_id": "000000000000000000000014",
+    "name": "Electriodomésticos y Aires Ac."
+  },
+  {
+    "_id": "000000000000000000000015",
+    "name": "Ropa y Accesorios"
+  },
+  {
+    "_id": "000000000000000000000016",
+    "name": "Deportes y Fitness"
+  },
+  {
+    "_id": "000000000000000000000017",
+    "name": "Hogar, Muebles y Jardín"
+  },
+  {
+    "_id": "000000000000000000000018",
+    "name": "Inmuebles"
+  },
+  {
+    "_id": "000000000000000000000019",
+    "name": "Accesorios para Vehiculos"
+  },
+  {
+    "_id": "000000000000000000000020",
+    "name": "Belleza y Cuidado Personal"
+  },
+  {
+    "_id": "000000000000000000000021",
+    "name": "Consolas y Videojuegos"
+  },
+  {
+    "_id": "000000000000000000000022",
+    "name": "Juegos y Juguetes"
+  },
+  {
+    "_id": "000000000000000000000023",
+    "name": "Alimentos y Bebidas"
+  },
+  {
+    "_id": "000000000000000000000024",
+    "name": "Herramientas"
+  },
+  {
+    "_id": "000000000000000000000025",
+    "name": "Bebés"
+  },
+  {
+    "_id": "000000000000000000000026",
+    "name": "Cámaras y Accesorios"
+  },
+  {
+    "_id": "000000000000000000000027",
+    "name": "Joyas y Relojes"
+  },
+  {
+    "_id": "000000000000000000000028",
+    "name": "Industrias y Oficinas"
+  },
+  {
+    "_id": "000000000000000000000029",
+    "name": "Libros, Revistas y Comics"
+  },
+  {
+    "_id": "000000000000000000000030",
+    "name": "Instrumentos Musicales"
+  },
+  {
+    "_id": "000000000000000000000031",
+    "name": "Animales y Mascotas"
+  },
+  {
+    "_id": "000000000000000000000032",
+    "name": "Antigüedades y Colecciones"
+  },
+  {
+    "_id": "000000000000000000000033",
+    "name": "Música, Películas y Series"
+  },
+  {
+    "_id": "000000000000000000000034",
+    "name": "Salud y Equipamiento Médico"
+  },
+  {
+    "_id": "000000000000000000000035",
+    "name": "Arte, Librería y Mercería"
+  },
+  {
+    "_id": "000000000000000000000036",
+    "name": "Otras Categorías"
+  }
+]

@@ -1,0 +1,13 @@
+paths:
+  /api/users:
+    get:
+      summary: use to get all Users
+      tags:
+        - Users
+      parameters:
+        - name: Id
+          in: params
+          required: true
+      responses:
+        200:
+          description: Successful request
