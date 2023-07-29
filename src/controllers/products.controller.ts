@@ -8,8 +8,6 @@ import {
   MethodPaymentSchema
 } from '@models';
 
-import { getProductsService } from '@services';
-
 import { IQuery } from '@interfaces';
 
 import { taxes } from '@utils';
@@ -54,12 +52,48 @@ export const postProducts: RequestHandler = async (req, res) => {
 export const getProducts: RequestHandler = async (req, res) => {
   const { page = 1, limit = 10 } = req.query as IQuery;
   try {
-    const products = await getProductsService(page, limit);
+    const productsLength: number = await ProductSchema.find({
+      isActive: true
+    }).count();
 
+    const products = await ProductSchema.find({
+      isActive: true,
+      isAvailable: true
+    })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+
+    const allProducts = await Promise.all(
+      products.map(async (product) => {
+        const seller = await SellerSchema.findById(product.sellerId);
+        const category = await CategorySchema.findById(product.categoryId);
+        const methodPayment = await Promise.all(
+          product.methodPayment.map(async (method) => {
+            const methods = await MethodPaymentSchema.findById(method);
+            return methods?.name;
+          })
+        );
+        const productData = {
+          ...product.toJSON(),
+          sellerId: seller?.toJSON(),
+          categoryId: category?.toJSON(),
+          methodPayment
+        };
+        return productData;
+      })
+    );
     if (products === null)
       return res.status(404).json({ message: 'Products not found' });
 
-    res.status(200).json(products);
+    const productsResponse = {
+      totalPages: Math.ceil(productsLength / limit),
+      currentPage: Number(page),
+      hasNextPage: limit * page < productsLength,
+      hasPreviousPage: page > 1,
+      products: allProducts
+    };
+
+    res.status(200).json(productsResponse);
   } catch (error) {
     logger.error((error as Error).message);
     return res.status(500).json({ message: { error } });

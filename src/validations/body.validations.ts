@@ -1,7 +1,7 @@
 import { body, ValidationChain } from 'express-validator';
 
 export const verifyEmail = (): ValidationChain => {
-  return body('email', 'Email format invalid')
+  return body('email', 'Email invalid')
     .trim()
     .isEmail()
     .normalizeEmail()

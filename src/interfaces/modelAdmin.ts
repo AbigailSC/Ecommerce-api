@@ -6,7 +6,7 @@ export interface AdminType extends Document {
   phone: number;
   email: string;
   document: string;
-  image: string;
+  image?: string;
   countryId: string;
   cityId: string;
 }

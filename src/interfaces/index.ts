@@ -16,3 +16,4 @@ export * from './modelStatus';
 export * from './modelTag';
 export * from './modelUser';
 export * from './paginate';
+export * from './products.interface';

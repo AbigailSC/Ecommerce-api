@@ -54,7 +54,7 @@ const productSchema = new Schema(
       type: Boolean,
       default: true
     },
-    image: [
+    imageId: [
       {
         type: String,
         required: false

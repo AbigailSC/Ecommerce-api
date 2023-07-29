@@ -18,7 +18,7 @@ const consoleTransport = new transports.Console({
 
 const fileTransport = new transports.File({
   filename: path.join(__dirname, `/../logs/app_${getCurrentDate()}.log`),
-  level: config.app.env === 'development' ? 'info' : 'debug',
+  level: config.app.env === 'production' ? 'info' : 'debug',
   maxsize: 5242880, // 5MB
   maxFiles: 5
 });
