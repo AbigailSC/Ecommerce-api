@@ -10,6 +10,7 @@ import {
 } from '@models';
 
 import { logger } from '@config';
+import { userRoles } from '@utils';
 
 export const getAdmins: RequestHandler = async (_req, res) => {
   try {
@@ -79,7 +80,7 @@ export const createAdmin: RequestHandler = async (req, res) => {
     });
     await newAdmin.save();
 
-    const rol = await RolSchema.findOne({ name: 'Admin' });
+    const rol = await RolSchema.findOne({ name: userRoles.Admin });
 
     const newUser = new UserSchema({
       email,

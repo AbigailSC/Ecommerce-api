@@ -10,6 +10,7 @@ import {
 } from '@models';
 
 import { logger } from '@config';
+import { userRoles } from '@utils';
 
 export const getSellers: RequestHandler = async (_req, res) => {
   try {
@@ -89,7 +90,7 @@ export const createSeller: RequestHandler = async (req, res) => {
     });
     await newSeller.save();
 
-    const rol = await RolSchema.findOne({ name: 'Seller' });
+    const rol = await RolSchema.findOne({ name: userRoles.Seller });
 
     const newUser = new UserSchema({
       email,
