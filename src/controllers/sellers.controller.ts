@@ -11,6 +11,8 @@ import {
 
 import { catchAsync } from '@middleware';
 
+import { userRoles } from '@utils';
+
 export const getSellers: RequestHandler = catchAsync(async (_req, res) => {
   const sellersDb = await SellerSchema.find();
   if (sellersDb === null)
@@ -73,7 +75,7 @@ export const createSeller: RequestHandler = catchAsync(async (req, res) => {
     cityId
   });
   await newSeller.save();
-  const rol = await RolSchema.findOne({ name: 'Seller' });
+  const rol = await RolSchema.findOne({ name: userRoles.Seller });
   const newUser = new UserSchema({
     email,
     rol: rol?.name

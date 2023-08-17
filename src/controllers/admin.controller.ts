@@ -11,6 +11,8 @@ import {
 
 import { catchAsync } from '@middleware';
 
+import { userRoles } from '@utils';
+
 export const getAdmins: RequestHandler = catchAsync(async (_req, res) => {
   const adminsDb = await AdminSchema.find();
   if (adminsDb === null) return res.status(204).json({ message: 'No content' });
@@ -65,7 +67,7 @@ export const createAdmin: RequestHandler = catchAsync(async (req, res) => {
     cityId
   });
   await newAdmin.save();
-  const rol = await RolSchema.findOne({ name: 'Admin' });
+  const rol = await RolSchema.findOne({ name: userRoles.Admin });
   const newUser = new UserSchema({
     email,
     rol: rol?.name

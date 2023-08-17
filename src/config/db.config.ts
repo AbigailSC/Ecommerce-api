@@ -18,7 +18,7 @@ export const connection = async (): Promise<void> => {
     logger.info('✔️ ...Database connected!');
     // await RolSchema.insertMany(rolSchema);
   } catch (error) {
-    logger.error(error);
+    logger.error((error as Error).message);
     throw new Error(chalk.red('❌ ...Database connection failed!'));
   }
 };

@@ -15,7 +15,8 @@ import {
 import {
   getActivationTemplate,
   getDuplicateMsg,
-  getMessageByRole
+  getMessageByRole,
+  userRoles
 } from '@utils';
 
 import { catchAsync } from '@middleware';
@@ -82,7 +83,7 @@ export const createClient: RequestHandler = catchAsync(async (req, res) => {
     image
   });
   await newClient.save();
-  const rol = await RolSchema.findOne({ name: 'Client' });
+  const rol = await RolSchema.findOne({ name: userRoles.Client });
   const newUser = new UserSchema({
     email,
     rol: rol?.name
