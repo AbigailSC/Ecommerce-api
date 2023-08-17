@@ -2,70 +2,45 @@ import { RequestHandler } from 'express';
 
 import { FavoriteSchema } from '@models';
 
-import { logger } from '@config';
+import { catchAsync } from '@middleware';
 
-export const getFavorites: RequestHandler = async (_req, res) => {
-  try {
-    const favoritesDb = await FavoriteSchema.find();
-    return res.status(200).json(favoritesDb);
-  } catch (error) {
-    logger.error((error as Error).message);
-    return res.status(500).json({ message: { error } });
-  }
-};
+export const getFavorites: RequestHandler = catchAsync(async (_req, res) => {
+  const favoritesDb = await FavoriteSchema.find();
+  return res.json(favoritesDb);
+});
 
-export const getFavorite: RequestHandler = async (req, res) => {
+export const getFavorite: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  try {
-    const favorite = await FavoriteSchema.findById(id);
-    return res.status(200).json(favorite);
-  } catch (error) {
-    logger.error((error as Error).message);
-    return res.status(500).json({ message: { error } });
-  }
-};
+  const favorite = await FavoriteSchema.findById(id);
+  return res.json(favorite);
+});
 
-export const createFavorite: RequestHandler = async (req, res) => {
+export const createFavorite: RequestHandler = catchAsync(async (req, res) => {
   const { clientId, products } = req.body;
-  try {
-    const favoriteDuplicate = await FavoriteSchema.findOne({ clientId });
-    if (favoriteDuplicate != null) {
-      return res.status(400).json({ message: 'Favorite already exists' });
-    }
-    const newFavorite = new FavoriteSchema({
-      clientId,
-      products
-    });
-    await newFavorite.save();
-    return res.status(201).json({ message: 'Favorite added' });
-  } catch (error) {
-    logger.error((error as Error).message);
-    return res.status(500).json({ message: { error } });
+  const favoriteDuplicate = await FavoriteSchema.findOne({ clientId });
+  if (favoriteDuplicate != null) {
+    return res.status(400).json({ message: 'Favorite already exists' });
   }
-};
+  const newFavorite = new FavoriteSchema({
+    clientId,
+    products
+  });
+  await newFavorite.save();
+  return res.status(201).json({ message: 'Favorite added' });
+});
 
-export const updateFavorite: RequestHandler = async (req, res) => {
+export const updateFavorite: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { clientId, products } = req.body;
-  try {
-    const updatedFavorite = await FavoriteSchema.findByIdAndUpdate(id, {
-      clientId,
-      products
-    });
-    return res.status(200).json(updatedFavorite);
-  } catch (error) {
-    logger.error((error as Error).message);
-    return res.status(500).json({ message: { error } });
-  }
-};
+  const updatedFavorite = await FavoriteSchema.findByIdAndUpdate(id, {
+    clientId,
+    products
+  });
+  return res.json(updatedFavorite);
+});
 
-export const deleteFavorite: RequestHandler = async (req, res) => {
+export const deleteFavorite: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  try {
-    const deletedFavorite = await FavoriteSchema.findByIdAndDelete(id);
-    return res.status(200).json(deletedFavorite);
-  } catch (error) {
-    logger.error((error as Error).message);
-    return res.status(500).json({ message: { error } });
-  }
-};
+  const deletedFavorite = await FavoriteSchema.findByIdAndDelete(id);
+  return res.json(deletedFavorite);
+});

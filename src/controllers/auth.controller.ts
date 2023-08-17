@@ -4,8 +4,7 @@ import { validationResult } from 'express-validator';
 import {
   CustomResponseCookie,
   generateRefreshToken,
-  generateToken,
-  logger
+  generateToken
 } from '@config';
 
 import { VerifyRefreshToken, catchAsync } from '@middleware';
@@ -36,19 +35,19 @@ export const singIn: RequestHandler = catchAsync(async (req, res) => {
   const matchPassword = await userFound.comparePassword(password);
   if (!matchPassword) return res.status(401).json({ msg: 'Invalid password' });
   generateRefreshToken(userFound._id, res as unknown as CustomResponseCookie);
-  return res.status(200).json({ message: 'Log in successfully' });
+  return res.json({ message: 'Log in successfully' });
 });
 
 export const logOut: RequestHandler = catchAsync(async (_req, res) => {
   res.clearCookie('refreshToken');
-  res.status(200).json({ message: 'Log out successfully' });
+  res.json({ message: 'Log out successfully' });
 });
 
 export const refreshToken: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req as VerifyRefreshToken;
   if (id === undefined) throw new Error('No id provided');
   const { token, expiresIn } = generateToken(id);
-  return res.status(200).json({ token, expiresIn });
+  return res.json({ token, expiresIn });
 });
 
 export const verify: RequestHandler = catchAsync(async (req, res) => {
@@ -57,7 +56,7 @@ export const verify: RequestHandler = catchAsync(async (req, res) => {
   if (userFound === null)
     return res.status(404).json({ message: 'User not found' });
   const { token, expiresIn } = generateToken(userFound._id);
-  return res.status(200).json({ token, expiresIn });
+  return res.json({ token, expiresIn });
 });
 
 export const forgotPassword: RequestHandler = catchAsync(async (req, res) => {
