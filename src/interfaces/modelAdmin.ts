@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface AdminType extends Document {
   name: string;
@@ -7,6 +7,6 @@ export interface AdminType extends Document {
   email: string;
   document: string;
   image?: string;
-  countryId: string;
-  cityId: string;
+  countryId: ObjectId;
+  cityId: ObjectId;
 }

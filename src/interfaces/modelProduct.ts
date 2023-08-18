@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface ProductType extends Document {
   name: string;
@@ -6,9 +6,9 @@ export interface ProductType extends Document {
   price: number;
   stock: number;
   discount: number;
-  sellerId: string;
+  sellerId: ObjectId;
   isActive: boolean;
-  categoryId: string;
+  categoryId: ObjectId;
   methodPayment: string[];
   isAvailable: boolean;
   imageId: string[];

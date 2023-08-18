@@ -1,6 +1,6 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface TagType extends Document {
   name: string;
-  categoryId: string;
+  categoryId: ObjectId;
 }

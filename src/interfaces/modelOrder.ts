@@ -1,12 +1,12 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface OrderType extends Document {
-  clientId: string;
-  methodPaymentId: string;
-  productId: string;
+  clientId: ObjectId;
+  methodPaymentId: ObjectId;
+  productId: ObjectId;
   quantity: number;
-  statusId: string;
+  statusId: ObjectId;
   address: string;
   amount: number;
-  sellerId: string;
+  sellerId: ObjectId;
 }

@@ -1,11 +1,11 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface FavoriteType extends Document {
-  clientId: string;
+  clientId: ObjectId;
   products: FavoriteItem[];
 }
 
 interface FavoriteItem {
-  productId: string;
+  productId: ObjectId;
   quantity: number;
 }

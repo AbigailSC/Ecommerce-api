@@ -1,7 +1,7 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface HistoryType extends Document {
-  orderId: string;
-  userId: string;
+  orderId: ObjectId;
+  userId: ObjectId;
   date: Date;
 }
