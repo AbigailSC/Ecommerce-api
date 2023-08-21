@@ -14,25 +14,20 @@ import { catchAsync } from '@middleware';
 import { userRoles } from '@utils';
 
 export const getAdmins: RequestHandler = catchAsync(async (_req, res) => {
-  const adminsDb = await AdminSchema.find();
+  const adminsDb = await AdminSchema.find()
+    .populate('cityId', 'name')
+    .populate('countryId', 'name')
+    .exec();
   if (adminsDb === null) return res.status(204).json({ message: 'No content' });
-  const adminsData = await Promise.all(
-    adminsDb.map(async (admin) => {
-      const city = await CitySchema.findById(admin.cityId);
-      const country = await CountrySchema.findById(admin.countryId);
-      return {
-        ...admin.toJSON(),
-        city: city?.toJSON(),
-        country: country?.toJSON()
-      };
-    })
-  );
-  return res.json(adminsData);
+  return res.json(adminsDb);
 });
 
 export const getAdminById: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const adminDb = await AdminSchema.findById(id);
+  const adminDb = await AdminSchema.findById(id)
+    .populate('cityId', 'name')
+    .populate('countryId', 'name')
+    .exec();
   if (adminDb === null)
     return res.status(204).json({ message: 'No admin found' });
 
@@ -47,29 +42,19 @@ export const getAdminById: RequestHandler = catchAsync(async (req, res) => {
 });
 
 export const createAdmin: RequestHandler = catchAsync(async (req, res) => {
-  const { name, lastname, phone, email, document, countryId, cityId, image } =
-    req.body;
-  const adminDuplicate = await AdminSchema.findOne({ email });
+  const data = req.body;
+  const adminDuplicate = await AdminSchema.findOne({ email: data.email });
   if (adminDuplicate !== null)
     return res.status(400).json({ message: 'Admin already exists' });
   const errors = validationResult(req);
   if (!errors.isEmpty())
     return res.status(400).json({ errors: errors.array() });
 
-  const newAdmin = new AdminSchema({
-    name,
-    lastname,
-    phone,
-    email,
-    document,
-    image,
-    countryId,
-    cityId
-  });
+  const newAdmin = new AdminSchema(data);
   await newAdmin.save();
   const rol = await RolSchema.findOne({ name: userRoles.Admin });
   const newUser = new UserSchema({
-    email,
+    email: data.email,
     rol: rol?.name
   });
   await newUser.save();

@@ -20,12 +20,17 @@ const clientSchema = new Schema(
       required: true,
       trim: true
     },
-    country: {
+    cartId: {
+      type: Schema.Types.ObjectId,
+      ref: 'cart',
+      required: true
+    },
+    countryId: {
       type: Schema.Types.ObjectId,
       ref: 'country',
       required: true
     },
-    city: {
+    cityId: {
       type: Schema.Types.ObjectId,
       ref: 'city',
       required: true

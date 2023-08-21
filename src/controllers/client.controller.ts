@@ -22,25 +22,14 @@ import {
 import { catchAsync } from '@middleware';
 
 export const getClients: RequestHandler = catchAsync(async (_req, res) => {
-  const clientsDb = await ClientSchema.find();
+  const clientsDb = await ClientSchema.find()
+    .populate('cityId', 'name')
+    .populate('countryId', 'name')
+    .populate('cartId', 'products')
+    .exec();
   if (clientsDb === null)
     return res.status(204).json({ message: 'No content' });
-  const clientsData = await Promise.all(
-    clientsDb.map(async (client) => {
-      const cart = await CartSchema.find({
-        client: client._id
-      });
-      const city = await CitySchema.findById(client.cityId);
-      const country = await CountrySchema.findById(client.countryId);
-      return {
-        ...client.toJSON(),
-        city: city?.toJSON(),
-        country: country?.toJSON(),
-        cart
-      };
-    })
-  );
-  return res.json(clientsData);
+  return res.json(clientsDb);
 });
 
 export const getClient: RequestHandler = catchAsync(async (req, res) => {
