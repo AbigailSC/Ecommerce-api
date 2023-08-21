@@ -1,46 +1,30 @@
 import { RequestHandler } from 'express';
 
-import { HistorySchema, UserSchema, OrderSchema } from '@models';
+import { HistorySchema } from '@models';
 
 import { catchAsync } from '@middleware';
 
 export const getHistory: RequestHandler = catchAsync(async (_req, res) => {
-  const history = await HistorySchema.find();
+  const history = await HistorySchema.find()
+    .populate('userId', 'email')
+    .populate('orderId', 'products')
+    .exec();
   if (history.length === 0) {
     return res.status(404).json({ message: 'History not found' });
   }
-  const historyData = await Promise.all(
-    history.map(async (history) => {
-      const userData = await UserSchema.findById({ _id: history.userId });
-      const orderData = await OrderSchema.findById({
-        _id: history.orderId
-      });
-      return {
-        ...history.toJSON(),
-        user: userData,
-        order: orderData
-      };
-    })
-  );
-  res.json(historyData);
+  res.json(history);
 });
 
 export const getHistoryById: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const history = await HistorySchema.findById(id);
+  const history = await HistorySchema.findById(id)
+    .populate('userId', 'email')
+    .populate('orderId', 'products')
+    .exec();
   if (history === null) {
     return res.status(404).json({ message: 'History not found' });
-  } else {
-    const userData = await UserSchema.findById({ _id: history.userId });
-    const orderData = await OrderSchema.findById({
-      _id: history.orderId
-    });
-    return {
-      ...history.toJSON(),
-      user: userData,
-      order: orderData
-    };
   }
+  res.json(history);
 });
 
 export const createHistory: RequestHandler = catchAsync(async (req, res) => {
@@ -54,15 +38,10 @@ export const createHistory: RequestHandler = catchAsync(async (req, res) => {
     orderId,
     date
   });
-  const savedHistory = await newHistory.save();
-  const userData = await UserSchema.findById({ _id: savedHistory.userId });
-  const orderData = await OrderSchema.findById({
-    _id: orderId
-  });
+  await newHistory.save();
+
   return res.status(201).json({
-    ...savedHistory.toJSON(),
-    user: userData,
-    order: orderData
+    message: 'History created'
   });
 });
 

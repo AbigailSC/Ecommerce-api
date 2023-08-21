@@ -1,64 +1,35 @@
 import { RequestHandler } from 'express';
 
-import {
-  ClientSchema,
-  MethodPaymentSchema,
-  OrderSchema,
-  ProductSchema,
-  SellerSchema,
-  StatusSchema
-} from '@models';
+import { ClientSchema, OrderSchema, ProductSchema } from '@models';
 
 import { catchAsync } from '@middleware';
 
 import { calculateAmount } from '@utils';
 
 export const getOrders: RequestHandler = catchAsync(async (_req, res) => {
-  const ordersCollection = await OrderSchema.find();
-  if (ordersCollection === null)
-    return res.status(204).json({ message: 'No content' });
-  const ordersData = await Promise.all(
-    ordersCollection.map(async (order) => {
-      const client = await ClientSchema.findById(order.clientId);
-      const methodPayment = await MethodPaymentSchema.findById(
-        order.methodPaymentId
-      );
-      const product = await ProductSchema.findById(order.productId);
-      const status = await StatusSchema.findById(order.statusId);
-      const seller = await SellerSchema.findById(order.sellerId);
-      return {
-        ...order.toJSON(),
-        clientId: client?.toJSON(),
-        methodPaymentId: methodPayment?.toJSON(),
-        productId: product?.toJSON(),
-        statusId: status?.toJSON(),
-        sellerId: seller?.toJSON()
-      };
-    })
-  );
-  res.json(ordersData);
+  const orders = await OrderSchema.find()
+    .populate('clientId')
+    .populate('methodPaymentId')
+    .populate('productId')
+    .populate('statusId')
+    .populate('sellerId')
+    .exec();
+  if (orders === null) return res.status(204).json({ message: 'No content' });
+  res.json(orders);
 });
 
 export const getOrder: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const orderDb = await OrderSchema.findById(id);
+  const orderDb = await OrderSchema.findById(id)
+    .populate('clientId')
+    .populate('methodPaymentId')
+    .populate('productId')
+    .populate('statusId')
+    .populate('sellerId')
+    .exec();
   if (orderDb === null)
     return res.status(204).json({ message: 'No order found' });
-  const client = await ClientSchema.findById(orderDb.clientId);
-  const methodPayment = await MethodPaymentSchema.findById(
-    orderDb.methodPaymentId
-  );
-  const product = await ProductSchema.findById(orderDb.productId);
-  const status = await StatusSchema.findById(orderDb.statusId);
-  const seller = await SellerSchema.findById(orderDb.sellerId);
-  return res.json({
-    ...orderDb.toJSON(),
-    client: client?.toJSON(),
-    methodPayment: methodPayment?.toJSON(),
-    product: product?.toJSON(),
-    status: status?.toJSON(),
-    seller: seller?.toJSON()
-  });
+  return res.json(orderDb);
 });
 
 export const createOrder: RequestHandler = catchAsync(async (req, res) => {

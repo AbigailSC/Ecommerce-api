@@ -52,35 +52,21 @@ export const getProducts: RequestHandler = catchAsync(async (req, res) => {
     isActive: true,
     isAvailable: true
   })
+    .populate('sellerId')
+    .populate('categoryId')
+    .populate('methodPayment')
     .limit(limit * 1)
     .skip((page - 1) * limit);
-  const allProducts = await Promise.all(
-    products.map(async (product) => {
-      const seller = await SellerSchema.findById(product.sellerId);
-      const category = await CategorySchema.findById(product.categoryId);
-      const methodPayment = await Promise.all(
-        product.methodPayment.map(async (method) => {
-          const methods = await MethodPaymentSchema.findById(method);
-          return methods?.name;
-        })
-      );
-      const productData = {
-        ...product.toJSON(),
-        sellerId: seller?.toJSON(),
-        categoryId: category?.toJSON(),
-        methodPayment
-      };
-      return productData;
-    })
-  );
+
   if (products === null)
     return res.status(404).json({ message: 'Products not found' });
+
   const productsResponse = {
     totalPages: Math.ceil(productsLength / limit),
     currentPage: Number(page),
     hasNextPage: limit * page < productsLength,
     hasPreviousPage: page > 1,
-    products: allProducts
+    products
   };
   res.json(productsResponse);
 });

@@ -3,14 +3,7 @@ import { validationResult } from 'express-validator';
 
 import { sendEmail } from '@config';
 
-import {
-  CartSchema,
-  CitySchema,
-  ClientSchema,
-  CountrySchema,
-  RolSchema,
-  UserSchema
-} from '@models';
+import { ClientSchema, RolSchema, UserSchema } from '@models';
 
 import {
   getActivationTemplate,
@@ -34,47 +27,31 @@ export const getClients: RequestHandler = catchAsync(async (_req, res) => {
 
 export const getClient: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const clientDb = await ClientSchema.findById(id);
+  const clientDb = await ClientSchema.findById(id)
+    .populate('cityId', 'name')
+    .populate('countryId', 'name')
+    .populate('cartId', 'products')
+    .exec();
   if (clientDb === null)
     return res.status(204).json({ message: 'No client found' });
-  const cart = await CartSchema.find({
-    client: clientDb._id
-  });
-  const city = await CitySchema.findById(clientDb.cityId);
-  const country = await CountrySchema.findById(clientDb.countryId);
-  return res.json({
-    ...clientDb.toJSON(),
-    city: city?.toJSON(),
-    country: country?.toJSON(),
-    cart
-  });
+  return res.json(clientDb);
 });
 
 export const createClient: RequestHandler = catchAsync(async (req, res) => {
-  const { name, lastname, address, phone, email, countryId, cityId, image } =
-    req.body;
-  const clientDuplicate = await ClientSchema.findOne({ email });
+  const data = req.body;
+  const clientDuplicate = await ClientSchema.findOne({ email: data.email });
   if (clientDuplicate !== null)
     return res.status(400).json({
-      message: getDuplicateMsg(email)
+      message: getDuplicateMsg(data.email)
     });
   const errors = validationResult(req);
   if (!errors.isEmpty())
     return res.status(400).json({ errors: errors.array() });
-  const newClient = new ClientSchema({
-    name,
-    lastname,
-    address,
-    phone,
-    email,
-    countryId,
-    cityId,
-    image
-  });
+  const newClient = new ClientSchema(data);
   await newClient.save();
   const rol = await RolSchema.findOne({ name: userRoles.Client });
   const newUser = new UserSchema({
-    email,
+    email: data.email,
     rol: rol?.name
   });
   await newUser.save();
@@ -84,7 +61,7 @@ export const createClient: RequestHandler = catchAsync(async (req, res) => {
     getActivationTemplate(newUser.emailVerifyTokenLink)
   );
   res.status(201).json({
-    message: getMessageByRole(newUser.rol, email)
+    message: getMessageByRole(newUser.rol, data.email)
   });
 });
 
@@ -111,6 +88,6 @@ export const deleteClient: RequestHandler = catchAsync(async (req, res) => {
   const client = await ClientSchema.findByIdAndDelete(id);
   if (client === null)
     return res.status(400).json({ message: 'Client not found' });
-  await UserSchema.findOneAndDelete({ email: client?.email });
+  await UserSchema.findOneAndDelete({ email: client.email });
   res.json({ message: 'Client deleted' });
 });
