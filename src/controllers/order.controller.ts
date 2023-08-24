@@ -66,3 +66,27 @@ export const updateOrder: RequestHandler = catchAsync(async (req, res) => {
   });
   return res.json(updateOrder);
 });
+
+export const deleteOrder: RequestHandler = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const orderExists = await OrderSchema.findById(id);
+  if (orderExists === null)
+    return res.status(400).json({ message: 'Order not found' });
+  await OrderSchema.findByIdAndDelete(id);
+  return res.json({ message: 'Order deleted' });
+});
+
+export const getOrdersByClient: RequestHandler = catchAsync(
+  async (req, res) => {
+    const { clientId } = req.params;
+    const orders = await OrderSchema.find({ clientId })
+      .populate('clientId')
+      .populate('methodPaymentId')
+      .populate('productId')
+      .populate('statusId')
+      .populate('sellerId')
+      .exec();
+    if (orders === null) return res.status(204).json({ message: 'No content' });
+    res.json(orders);
+  }
+);
