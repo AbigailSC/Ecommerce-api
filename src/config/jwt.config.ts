@@ -14,7 +14,7 @@ export interface CustomResponseCookie extends Response {
 
 export const generateToken = (id: string): GenerateToken => {
   try {
-    const expiresIn = 60 * 15; // 15 minutes
+    const expiresIn = 60 * 30; // 30 minutes
     const token = jwt.sign({ id }, config.auth.jwtSecret, {
       expiresIn
     });

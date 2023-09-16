@@ -1,9 +1,13 @@
 import { body, ValidationChain } from 'express-validator';
-
+// ! This is not used
 export const verifyEmail = (): ValidationChain => {
-  return body('email', 'Email invalid')
+  return body('email')
+    .not()
     .trim()
+    .isEmpty()
+    .withMessage('Email is required')
     .isEmail()
+    .withMessage('Email format invalid')
     .normalizeEmail()
     .escape();
 };
@@ -13,10 +17,15 @@ export const verifyRol = (): ValidationChain => {
 };
 
 export const verifyPassword = (): ValidationChain => {
-  return body('password', 'Password format invalid')
+  return body('password')
     .not()
+    .isEmpty()
+    .withMessage('Password is required')
     .trim()
-    .isStrongPassword();
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters')
+    .isStrongPassword()
+    .withMessage('Password format invalid');
 };
 
 export const verifyPhone = (): ValidationChain => {

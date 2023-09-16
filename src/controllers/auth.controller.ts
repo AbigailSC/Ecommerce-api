@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { validationResult } from 'express-validator';
 
 import {
   CustomResponseCookie,
@@ -21,26 +20,33 @@ import {
 
 export const singIn: RequestHandler = catchAsync(async (req, res) => {
   const { email, password } = req.body;
-  const errors = validationResult(req);
   const userFound = await UserSchema.findOne({ email });
   if (userFound === null) {
     return res.status(404).json({
+      status: res.statusCode,
       message: messageEmailNotFound(email)
     });
   }
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
   if (!userFound.verified)
     return res.status(401).json({ msg: 'User not verified' });
   const matchPassword = await userFound.comparePassword(password);
-  if (!matchPassword) return res.status(401).json({ msg: 'Invalid password' });
+  if (!matchPassword)
+    return res
+      .status(401)
+      .json({ status: res.statusCode, message: 'Invalid password' });
   generateRefreshToken(userFound._id, res as unknown as CustomResponseCookie);
-  return res.json({ message: 'Log in successfully' });
+  return res.json({
+    status: res.statusCode,
+    message: 'Log in successfully'
+  });
 });
 
 export const logOut: RequestHandler = catchAsync(async (_req, res) => {
   res.clearCookie('refreshToken');
-  res.json({ message: 'Log out successfully' });
+  res.json({
+    status: res.statusCode,
+    message: 'Log out successfully'
+  });
 });
 
 export const refreshToken: RequestHandler = catchAsync(async (req, res) => {
@@ -57,25 +63,24 @@ export const verify: RequestHandler = catchAsync(async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   const { token, expiresIn } = generateToken(userFound._id);
   return res.json({ token, expiresIn });
-});
+}); // ! This is not used
 
 export const forgotPassword: RequestHandler = catchAsync(async (req, res) => {
   interface RequestBody {
     email: string;
   }
   const { email } = req.body as RequestBody;
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
   const user = await UserSchema.findOne({ email });
   if (user === null)
     return res.status(500).json({
+      status: res.statusCode,
       message: messageEmailNotFound(email)
     });
   const { token, expiresIn } = generateToken(user._id);
 
   await user.updateOne({ resetPasswordTokenLink: token, expiresIn });
   return res.json({
+    status: res.statusCode,
     message: messageForgotPassword(email)
   });
 });
@@ -83,12 +88,14 @@ export const forgotPassword: RequestHandler = catchAsync(async (req, res) => {
 export const resetPassword: RequestHandler = catchAsync(async (req, res) => {
   const { resetPasswordTokenLink, newPassword } = req.body;
   const user = await UserSchema.findOne({ resetPasswordTokenLink });
-  if (user === null) return res.status(500).json({ message: 'User not found' });
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
+  if (user === null)
+    return res
+      .status(500)
+      .json({ status: res.statusCode, message: 'User not found' });
   if (user.resetPasswordTokenLink === '')
-    return res.status(500).json({ message: 'Invalid Link' });
+    return res
+      .status(500)
+      .json({ status: res.statusCode, message: 'Invalid Link' });
   const encryptedPassword = await user.encryptPassword(newPassword);
   const updatedUser = {
     password: encryptedPassword,
@@ -96,6 +103,7 @@ export const resetPassword: RequestHandler = catchAsync(async (req, res) => {
   };
   await user.updateOne(updatedUser);
   res.json({
+    status: res.statusCode,
     message: messageResetPassword()
   });
 });
@@ -103,42 +111,40 @@ export const resetPassword: RequestHandler = catchAsync(async (req, res) => {
 export const emailVerify: RequestHandler = catchAsync(async (req, res) => {
   const token = req.headers.authorization;
   const user = await UserSchema.findOne({ emailVerificationToken: token });
-  if (user === null) return res.status(500).json({ message: 'User not found' });
+  if (user === null)
+    return res
+      .status(500)
+      .json({ status: res.statusCode, message: 'User not found' });
   if (user.emailVerifyTokenLink === '')
     return res.status(500).json({
+      status: res.statusCode,
       message: messageTokenExpired()
     });
   user.emailVerifyTokenLink = '';
   await user.updateOne(user);
   res.json({
+    status: res.statusCode,
     message: 'Email verified! Now you can login with your new password.'
   });
 });
 
 export const activateAccount: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
-
-  if (password === undefined)
-    return res.status(500).json({ message: 'Password is required.' });
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
   const user = await UserSchema.findById(id);
   if (user === null)
-    return res.status(500).json({ message: 'User not found.' });
+    return res
+      .status(500)
+      .json({ status: res.statusCode, message: 'User not found.' });
   if (user.verified)
     return res.status(500).json({
+      status: res.statusCode,
       message: messageEmailAlreadyVerified()
     });
-
-  const encryptedPassword = await user.encryptPassword(password);
   await UserSchema.findByIdAndUpdate(id, {
-    password: encryptedPassword,
     verified: true
   });
-
   res.json({
+    status: res.statusCode,
     message: messageEmailActivated()
   });
 });

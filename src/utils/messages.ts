@@ -3,7 +3,7 @@ export const messageEmailNotFound = (email: string): string => {
 };
 
 export const messageForgotPassword = (email: string): string => {
-  return `Auth success. An Email with Reset password link has been sent to your account ${email}  please check to rest your password or use the the link which is been send with the response body to rest your password`;
+  return `Auth success. An Email with Reset password link has been sent to your account ${email}. Please check to rest your password or use the the link which is been send with the response body to rest your password`;
 };
 
 export const messageResetPassword = (): string => {

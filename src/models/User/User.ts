@@ -12,7 +12,7 @@ const usersSchema = new Schema(
     },
     password: {
       type: String,
-      required: false,
+      required: true,
       trim: true
     },
     rol: {

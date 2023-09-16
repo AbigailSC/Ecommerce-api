@@ -1,5 +1,6 @@
 import { logger } from '@config';
 import { Request, Response, NextFunction } from 'express';
+import { Result, ValidationError, validationResult } from 'express-validator';
 
 type ControllerFunction = (
   req: Request,
@@ -20,3 +21,16 @@ export const catchAsync: CatchAsyncMiddleware =
       return res.status(500).json({ message: (error as Error).message });
     }
   };
+
+export const recolectErrors = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const errors: Result<ValidationError> = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(400).json({ errors: errors.array() });
+  } else {
+    next();
+  }
+};

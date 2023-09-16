@@ -30,6 +30,8 @@ export const verifyTokenActivated: RequestHandler = async (
     const user = await UserSchema.findById(decoded.id, {
       password: 0
     });
+    console.log('🚀 ~ file: auth.middleware.ts:33 ~ user:', user);
+
     if (user === null)
       return res.status(404).json({ message: 'No user found' });
     if (user.verified)
@@ -52,7 +54,6 @@ export const verifyRoles: (roles: string[]) => RequestHandler =
       typeof req.headers.authorization === 'string'
         ? req.headers.authorization
         : '';
-
     try {
       if (token.length === 0)
         return res.status(401).json({ message: 'You need to enter a token' });
