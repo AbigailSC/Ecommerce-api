@@ -14,7 +14,8 @@ import { recolectErrors, verifyRoles } from '@middleware';
 
 import { userRoles } from '@utils';
 
-import { check } from 'express-validator';
+import { check, param } from 'express-validator';
+import { verifyCreate } from '@validations';
 
 const router: Router = Router();
 
@@ -24,16 +25,7 @@ router
   .post(
     [
       verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
-      check('email', 'Email is required').not().isEmpty(),
-      check('email').isEmail().withMessage('Email format invalid'),
-      check('email').normalizeEmail().escape(),
-      check('password', 'Password is required').not().isEmpty(),
-      check(
-        'password',
-        'Password should have at least 8 chars, 1 lowercase, 1 uppercase, 1 number, 1 symbol'
-      ).isStrongPassword(),
-      check('rol', 'Rol is required').not().isEmpty(),
-      recolectErrors
+      ...verifyCreate
     ],
     createUser
   );
@@ -46,17 +38,38 @@ router
 router
   .route('/:id')
   .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
+    [
+      verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
+      param('id', 'Id format invalid').isMongoId(),
+      recolectErrors
+    ],
+
     getUserById
   )
   .put(
     [
       verifyRoles([userRoles.Admin]),
-      check('password', 'Password is required').not().isEmpty()
+      param('id', 'Id format invalid').isMongoId(),
+      check('password', 'Password is required').not().isEmpty(),
+      recolectErrors
     ],
     updateUser
   )
-  .delete([verifyRoles([userRoles.Admin])], deleteUser)
-  .patch([verifyRoles([userRoles.Admin])], restoreUser);
+  .delete(
+    [
+      verifyRoles([userRoles.Admin]),
+      param('id', 'Id format invalid').isMongoId(),
+      recolectErrors
+    ],
+    deleteUser
+  )
+  .patch(
+    [
+      verifyRoles([userRoles.Admin]),
+      param('id', 'Id format invalid').isMongoId(),
+      recolectErrors
+    ],
+    restoreUser
+  );
 
 export default router;

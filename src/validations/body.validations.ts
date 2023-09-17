@@ -1,16 +1,21 @@
-import { body, ValidationChain } from 'express-validator';
-// ! This is not used
-export const verifyEmail = (): ValidationChain => {
-  return body('email')
-    .not()
-    .trim()
-    .isEmpty()
-    .withMessage('Email is required')
-    .isEmail()
-    .withMessage('Email format invalid')
-    .normalizeEmail()
-    .escape();
-};
+import { recolectErrors } from '@middleware';
+import { NextFunction, Request, Response } from 'express';
+import { body, check, ValidationChain } from 'express-validator';
+
+export const verifyCreate = [
+  check('email', 'Email is required').exists().not().isEmpty(),
+  check('email').isEmail().withMessage('Email format invalid'),
+  check('email').normalizeEmail().escape(),
+  check('password', 'Password is required').not().isEmpty(),
+  check(
+    'password',
+    'Password should have at least 8 chars, 1 lowercase, 1 uppercase, 1 number, 1 symbol'
+  ).isStrongPassword(),
+  check('rol', 'Rol is required').not().isEmpty(),
+  (req: Request, res: Response, next: NextFunction) => {
+    recolectErrors(req, res, next);
+  }
+];
 
 export const verifyRol = (): ValidationChain => {
   return body('rol', 'Rol is required').not().isEmpty();

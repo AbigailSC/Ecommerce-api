@@ -17,10 +17,16 @@ export const createUser: RequestHandler = catchAsync(async (req, res) => {
   const encryptedPassword = await newUser.encryptPassword(password);
   newUser.password = encryptedPassword;
   const savedUser = await newUser.save();
+
+  const responseUser = savedUser.toObject();
+  delete responseUser.password;
+  delete responseUser.createdAt;
+  delete responseUser.updatedAt;
+
   return res.status(201).json({
     status: res.statusCode,
     message: 'User created',
-    data: savedUser
+    data: responseUser
   });
 });
 
@@ -41,7 +47,9 @@ export const getUserById: RequestHandler = catchAsync(async (req, res) => {
   const user = await UserSchema.findById(id).select(
     '-password -__v -createdAt -updatedAt'
   );
-  if (user === null) res.json({ message: 'User not found!' });
+  if (user === null) {
+    return res.json({ status: res.statusCode, message: 'User not found!' });
+  }
   res.json({
     status: res.statusCode,
     message: 'User found',
@@ -112,8 +120,7 @@ export const profile: RequestHandler = catchAsync(
       });
     if (profile.rol === userRoles.Admin) {
       const adminUser = await AdminSchema.findOne({ email: profile.email })
-        .populate('name')
-        .populate('lastname')
+        .select('-password -__v -createdAt -updatedAt')
         .populate({
           path: 'countryId',
           select: 'name -_id'
@@ -121,9 +128,7 @@ export const profile: RequestHandler = catchAsync(
         .populate({
           path: 'cityId',
           select: 'name -_id'
-        })
-        .populate('phone')
-        .populate('email');
+        });
       return res.json({
         status: res.statusCode,
         userId: profile._id,
@@ -132,8 +137,7 @@ export const profile: RequestHandler = catchAsync(
       });
     } else if (profile.rol === userRoles.Client) {
       const clientUser = await ClientSchema.findOne({ email: profile.email })
-        .populate('name')
-        .populate('lastname')
+        .select('-password -__v -createdAt -updatedAt')
         .populate({
           path: 'countryId',
           select: 'name -_id'
@@ -141,9 +145,7 @@ export const profile: RequestHandler = catchAsync(
         .populate({
           path: 'cityId',
           select: 'name -_id'
-        })
-        .populate('phone')
-        .populate('email');
+        });
       return res.json({
         status: res.statusCode,
         userId: profile._id,
@@ -152,8 +154,7 @@ export const profile: RequestHandler = catchAsync(
       });
     } else if (profile.rol === userRoles.Seller) {
       const sellerUser = await SellerSchema.findOne({ email: profile.email })
-        .populate('name')
-        .populate('lastname')
+        .select('-password -__v -createdAt -updatedAt')
         .populate({
           path: 'countryId',
           select: 'name -_id'
@@ -161,9 +162,7 @@ export const profile: RequestHandler = catchAsync(
         .populate({
           path: 'cityId',
           select: 'name -_id'
-        })
-        .populate('phone')
-        .populate('email');
+        });
       return res.json({
         status: res.statusCode,
         userId: profile._id,

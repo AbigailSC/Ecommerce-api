@@ -12,24 +12,18 @@ import { verifyRoles } from '@middleware';
 
 import { userRoles } from '@utils';
 
-import { verifyEmail, verifyPhone } from '@validations';
+import { verifyPhone } from '@validations';
 
 const router = Router();
 
 router
   .route('/')
   .get(verifyRoles([userRoles.Admin]), getAdmins)
-  .post(
-    [verifyRoles([userRoles.Admin]), verifyEmail(), verifyPhone()],
-    createAdmin
-  );
+  .post([verifyRoles([userRoles.Admin]), verifyPhone()], createAdmin);
 router
   .route('/:id')
   .get([verifyRoles([userRoles.Admin])], getAdminById)
-  .put(
-    [verifyRoles([userRoles.Admin]), verifyEmail(), verifyPhone()],
-    updateAdmin
-  )
+  .put([verifyRoles([userRoles.Admin]), verifyPhone()], updateAdmin)
   .delete([verifyRoles([userRoles.Admin])], deleteAdmin);
 
 export default router;

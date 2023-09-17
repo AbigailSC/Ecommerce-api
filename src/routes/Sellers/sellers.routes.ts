@@ -12,7 +12,7 @@ import { verifyRoles } from '@middleware';
 
 import { userRoles } from '@utils';
 
-import { verifyEmail, verifyPhone } from '@validations';
+import { verifyPhone } from '@validations';
 
 const router: Router = Router();
 
@@ -20,22 +20,14 @@ router
   .route('/')
   .get([verifyRoles([userRoles.Admin])], getSellers)
   .post(
-    [
-      verifyRoles([userRoles.Admin, userRoles.Seller]),
-      verifyEmail(),
-      verifyPhone()
-    ],
+    [verifyRoles([userRoles.Admin, userRoles.Seller]), verifyPhone()],
     createSeller
   );
 router
   .route('/:id')
   .get([verifyRoles([userRoles.Admin, userRoles.Seller])], getSeller)
   .put(
-    [
-      verifyRoles([userRoles.Admin, userRoles.Seller]),
-      verifyEmail(),
-      verifyPhone()
-    ],
+    [verifyRoles([userRoles.Admin, userRoles.Seller]), verifyPhone()],
     updateSeller
   )
   .delete([verifyRoles([userRoles.Admin])], deleteSeller);

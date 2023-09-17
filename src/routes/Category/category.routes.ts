@@ -11,7 +11,7 @@ import {
 import { recolectErrors, verifyRoles } from '@middleware';
 
 import { userRoles } from '@utils';
-import { check } from 'express-validator';
+import { check, param } from 'express-validator';
 
 const router = Router();
 
@@ -34,7 +34,10 @@ router
 router
   .route('/:id')
   .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
+    [
+      verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
+      param('id', 'Id is required').not().isEmpty()
+    ],
     getCategoryById
   )
   .put(

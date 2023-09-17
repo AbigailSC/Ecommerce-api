@@ -11,7 +11,6 @@ import { VerifyRefreshToken, catchAsync } from '@middleware';
 import { UserSchema } from '@models';
 import {
   messageEmailActivated,
-  messageEmailAlreadyVerified,
   messageEmailNotFound,
   messageForgotPassword,
   messageResetPassword,
@@ -63,7 +62,7 @@ export const verify: RequestHandler = catchAsync(async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   const { token, expiresIn } = generateToken(userFound._id);
   return res.json({ token, expiresIn });
-}); // ! This is not used
+});
 
 export const forgotPassword: RequestHandler = catchAsync(async (req, res) => {
   interface RequestBody {
@@ -126,20 +125,15 @@ export const emailVerify: RequestHandler = catchAsync(async (req, res) => {
     status: res.statusCode,
     message: 'Email verified! Now you can login with your new password.'
   });
-});
+}); // ya no me acuerdo que hace esto, creo que tiene que ver con el token del emailVerificationToken
 
 export const activateAccount: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
+  const { id } = req as VerifyRefreshToken;
   const user = await UserSchema.findById(id);
   if (user === null)
     return res
       .status(500)
       .json({ status: res.statusCode, message: 'User not found.' });
-  if (user.verified)
-    return res.status(500).json({
-      status: res.statusCode,
-      message: messageEmailAlreadyVerified()
-    });
   await UserSchema.findByIdAndUpdate(id, {
     verified: true
   });
@@ -147,4 +141,4 @@ export const activateAccount: RequestHandler = catchAsync(async (req, res) => {
     status: res.statusCode,
     message: messageEmailActivated()
   });
-});
+}); // ? THIS VERIFY THE ACCOUNT

@@ -20,7 +20,7 @@ import { check } from 'express-validator';
 
 const router = Router();
 
-router.route('/verify/:id').get(verify);
+router.route('/verify/:id').get(verify); // verificamos para obtener el token para recien poder activar la cuenta
 router
   .route('/signin')
   .post(
@@ -31,14 +31,13 @@ router
     ],
     singIn
   );
-router.put('/email-verification/:id', [verifyTokenActivated], verify);
+router.put('/activate/:id', [verifyTokenActivated], activateAccount);
 router
   .route('/forgot-password')
   .put(
     [
       verifyRefreshToken,
       check('email', 'Email is required').not().isEmpty(),
-      check('email', 'Email is not valid').isEmail(),
       recolectErrors
     ],
     forgotPassword
@@ -56,7 +55,7 @@ router
     ],
     resetPassword
   );
-router.route('/activate/:id').put([verifyTokenActivated], activateAccount);
+// router.route('/activate/:id').put([verifyTokenActivated], activateAccount); // ! This is not used
 router.route('/logout').get([verifyRefreshToken], logOut);
 router.route('/refresh-token').get([verifyRefreshToken], refreshToken);
 
