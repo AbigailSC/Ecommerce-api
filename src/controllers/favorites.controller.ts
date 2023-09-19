@@ -5,13 +5,19 @@ import { FavoriteSchema } from '@models';
 import { catchAsync } from '@middleware';
 
 export const getFavorites: RequestHandler = catchAsync(async (_req, res) => {
-  const favoritesDb = await FavoriteSchema.find();
-  return res.json(favoritesDb);
+  const favoritesDb = await FavoriteSchema.find().populate('clientId');
+  return res.json({
+    status: res.statusCode,
+    message: 'Favorites found',
+    data: favoritesDb
+  });
 });
 
 export const getFavorite: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const favorite = await FavoriteSchema.findById(id);
+  const favorite = await FavoriteSchema.findById(id).populate(
+    'products.productId'
+  );
   return res.json(favorite);
 });
 

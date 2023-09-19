@@ -18,7 +18,11 @@ export const getAdmins: RequestHandler = catchAsync(async (_req, res) => {
     .populate('cityId', 'name')
     .populate('countryId', 'name')
     .exec();
-  if (adminsDb === null) return res.status(204).json({ message: 'No content' });
+  if (adminsDb === null)
+    return res.status(204).json({
+      status: res.statusCode,
+      message: 'No content'
+    });
   return res.json(adminsDb);
 });
 
@@ -29,7 +33,10 @@ export const getAdminById: RequestHandler = catchAsync(async (req, res) => {
     .populate('countryId', 'name')
     .exec();
   if (adminDb === null)
-    return res.status(204).json({ message: 'No admin found' });
+    return res.status(204).json({
+      status: res.statusCode,
+      message: 'No content'
+    });
 
   const city = await CitySchema.findById(adminDb.cityId);
   const country = await CountrySchema.findById(adminDb.countryId);
@@ -45,7 +52,10 @@ export const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   const data = req.body;
   const adminDuplicate = await AdminSchema.findOne({ email: data.email });
   if (adminDuplicate !== null)
-    return res.status(400).json({ message: 'Admin already exists' });
+    return res.status(400).json({
+      status: res.statusCode,
+      message: 'Admin already exists'
+    });
   const errors = validationResult(req);
   if (!errors.isEmpty())
     return res.status(400).json({ errors: errors.array() });
@@ -58,7 +68,10 @@ export const createAdmin: RequestHandler = catchAsync(async (req, res) => {
     rol: rol?.name
   });
   await newUser.save();
-  return res.status(201).json({ message: 'Admin created' });
+  return res.status(201).json({
+    status: res.statusCode,
+    message: 'Admin created'
+  });
 });
 
 export const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
@@ -77,14 +90,23 @@ export const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
     cityId,
     image
   });
-  res.json({ message: 'Admin updated' });
+  res.json({
+    status: res.statusCode,
+    message: 'Admin updated'
+  });
 });
 
 export const deleteAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const admin = await AdminSchema.findByIdAndDelete(id);
   if (admin === null)
-    return res.status(204).json({ message: 'Admin not found' });
+    return res.status(204).json({
+      status: res.statusCode,
+      message: 'Admin not found'
+    });
   await UserSchema.findOneAndDelete({ email: admin.email });
-  return res.json({ message: 'Admin deleted' });
+  return res.json({
+    status: res.statusCode,
+    message: 'Admin deleted'
+  });
 });

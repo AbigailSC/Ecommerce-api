@@ -17,6 +17,15 @@ export const verifyCreate = [
   }
 ];
 
+export const verifyName = [
+  check('name', 'Name is required').not().isEmpty(),
+  check('name', 'Name must be at least 3 characters').isLength({ min: 3 }),
+  check('name', 'Name of category is not a string').isString(),
+  (req: Request, res: Response, next: NextFunction) => {
+    recolectErrors(req, res, next);
+  }
+];
+
 export const verifyRol = (): ValidationChain => {
   return body('rol', 'Rol is required').not().isEmpty();
 };

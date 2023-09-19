@@ -8,13 +8,20 @@ export const getCountry: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const country = await CountrySchema.findById(id);
   if (country == null)
-    return res.status(404).json({ message: 'Country not found' });
+    return res.status(404).json({
+      status: res.statusCode,
+      message: 'Country not found'
+    });
   res.json(country);
 });
 
 export const getCountries: RequestHandler = catchAsync(async (_req, res) => {
   const countries = await CountrySchema.find();
-  res.json(countries);
+  res.json({
+    status: res.statusCode,
+    message: 'Countries found',
+    data: countries
+  });
 });
 
 export const createCountry: RequestHandler = catchAsync(async (req, res) => {
@@ -23,7 +30,11 @@ export const createCountry: RequestHandler = catchAsync(async (req, res) => {
     name
   });
   const savedCountry = await newCountry.save();
-  res.status(201).json(savedCountry);
+  res.status(201).json({
+    status: res.statusCode,
+    message: 'Country created',
+    data: savedCountry
+  });
 });
 
 export const updateCountry: RequestHandler = catchAsync(async (req, res) => {
@@ -31,14 +42,26 @@ export const updateCountry: RequestHandler = catchAsync(async (req, res) => {
   const { name } = req.body;
   const updatedCountry = await CountrySchema.findByIdAndUpdate(id, { name });
   if (updatedCountry == null)
-    return res.status(404).json({ message: 'Country not found' });
-  res.json({ message: 'Country updated' });
+    return res.status(404).json({
+      status: res.statusCode,
+      message: 'Country not found'
+    });
+  res.json({
+    status: res.statusCode,
+    message: 'Country updated'
+  });
 });
 
 export const deleteCountry: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const deleteCountry = await CountrySchema.findByIdAndDelete(id);
   if (deleteCountry == null)
-    return res.status(404).json({ message: 'Country not found' });
-  res.json({ message: 'Country deleted' });
+    return res.status(404).json({
+      status: res.statusCode,
+      message: 'Country not found'
+    });
+  res.json({
+    status: res.statusCode,
+    message: 'Country deleted'
+  });
 });
