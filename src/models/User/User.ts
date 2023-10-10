@@ -58,5 +58,9 @@ usersSchema.methods.comparePassword = async function (
 ) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+usersSchema.methods.toJSON = function () {
+  const { _v, password, _id, emailVerifyTokenLink, ...user } = this.toObject();
+  return user;
+};
 
 export default model<UserType>('user', usersSchema);

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
@@ -17,7 +17,7 @@ dotenv.config();
 
 const specs = swaggerJsdoc(swaggerDefinition);
 
-export const app: express.Application = express();
+export const app: Application = express();
 
 void connection();
 

@@ -18,15 +18,10 @@ export const createUser: RequestHandler = catchAsync(async (req, res) => {
   newUser.password = encryptedPassword;
   const savedUser = await newUser.save();
 
-  const responseUser = savedUser.toObject();
-  delete responseUser.password;
-  delete responseUser.createdAt;
-  delete responseUser.updatedAt;
-
   return res.status(201).json({
     status: res.statusCode,
     message: 'User created',
-    data: responseUser
+    data: savedUser
   });
 });
 
