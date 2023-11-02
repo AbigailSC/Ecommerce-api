@@ -14,10 +14,23 @@ export const messageTokenExpired = (): string => {
   return 'Email verification token is invalid or has expired. Please click on resend for verify your Email.';
 };
 
+export const messageEmailVerified = (): string => {
+  return 'Email verified! Now you can login with your new password.';
+};
+
 export const messageEmailAlreadyVerified = (): string => {
   return 'Your email has already been verified. Please Login.';
+};
+
+export const messageEmailAlreadyActivated = (): string => {
+  return 'Your email has already been activated. Please Login.';
 };
 
 export const messageEmailActivated = (): string => {
   return 'Account activated! Now you can login with your new password.';
 };
+
+export const messageEmailDesactivated = (): string => {
+  return 'Account desactivated!';
+};
+// ! Cambiar a objeto con todos los msgs

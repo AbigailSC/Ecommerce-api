@@ -1,3 +1,4 @@
+export * from './jwt.interface';
 export * from './modelAdmin';
 export * from './modelCart';
 export * from './modelCategory';

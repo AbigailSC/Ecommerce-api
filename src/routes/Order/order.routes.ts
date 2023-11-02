@@ -4,19 +4,16 @@ import { getOrders, getOrder, createOrder } from '@controllers';
 
 import { verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 const router = Router();
 
 router
   .route('/')
-  .get([verifyRoles([userRoles.Admin])], getOrders)
-  .post([verifyRoles([userRoles.Admin, userRoles.Client])], createOrder);
+  .get([verifyRoles([ROLES.Admin])], getOrders)
+  .post([verifyRoles([ROLES.Admin, ROLES.Client])], createOrder);
 router
   .route('/:id')
-  .get(
-    [verifyRoles([userRoles.Admin, userRoles.Seller, userRoles.Client])],
-    getOrder
-  );
+  .get([verifyRoles([ROLES.Admin, ROLES.Seller, ROLES.Client])], getOrder);
 
 export default router;

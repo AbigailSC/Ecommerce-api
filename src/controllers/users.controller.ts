@@ -1,19 +1,33 @@
 import { RequestHandler } from 'express';
 
-import { UserSchema, AdminSchema, ClientSchema, SellerSchema } from '@models';
+import { UserSchema } from '@models';
 
-import { VerifyRefreshToken, catchAsync } from '@middleware';
+import { catchAsync } from '@middleware';
 
-import { userRoles } from '@utils';
-import { UserType } from '@interfaces';
+import { ROLES } from '@constants';
+import { CustomRequest, UserType } from '@interfaces';
+import { getAdminUser, getClientUser, getSellerUser } from '@utils';
+import { generateToken } from '@config';
 
 export const createUser: RequestHandler = catchAsync(async (req, res) => {
-  const { email, password, rol }: UserType = req.body;
+  const { email, password }: UserType = req.body;
   const newUser = new UserSchema({
-    email,
-    rol,
-    emailVerifyTokenLink: req.cookies.refreshToken
+    email
   });
+
+  const token = await generateToken(newUser.id);
+  newUser.emailVerifyTokenLink = token;
+
+  const sellerKey = req.headers['seller-key'] as string;
+  if (sellerKey) {
+    newUser.rol = ROLES.Seller;
+  }
+
+  const adminKey = req.headers['admin-key'] as string;
+  if (adminKey) {
+    newUser.rol = ROLES.Admin;
+  }
+
   const encryptedPassword = await newUser.encryptPassword(password);
   newUser.password = encryptedPassword;
   const savedUser = await newUser.save();
@@ -26,9 +40,7 @@ export const createUser: RequestHandler = catchAsync(async (req, res) => {
 });
 
 export const getUsers: RequestHandler = catchAsync(async (_req, res) => {
-  const allUsers = await UserSchema.find({ isActive: true }).select(
-    '-password -__v -createdAt -updatedAt'
-  );
+  const allUsers = await UserSchema.find({ isActive: true });
   if (allUsers.length === 0) res.json({ message: 'No users found' });
   res.json({
     status: res.statusCode,
@@ -39,9 +51,7 @@ export const getUsers: RequestHandler = catchAsync(async (_req, res) => {
 
 export const getUserById: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const user = await UserSchema.findById(id).select(
-    '-password -__v -createdAt -updatedAt'
-  );
+  const user = await UserSchema.findById(id);
   if (user === null) {
     return res.json({ status: res.statusCode, message: 'User not found!' });
   }
@@ -88,24 +98,26 @@ export const deleteUser: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
-export const restoreUser: RequestHandler = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  const restoreUser = await UserSchema.findByIdAndUpdate(id, {
-    isActive: true
-  });
-  if (restoreUser === null)
+export const restoreUser: RequestHandler = catchAsync(
+  async (req: CustomRequest, res) => {
+    const { id } = req;
+    const restoreUser = await UserSchema.findByIdAndUpdate(id, {
+      isActive: true
+    });
+    if (restoreUser === null)
+      res.json({
+        status: res.statusCode,
+        message: 'User not found'
+      });
     res.json({
       status: res.statusCode,
-      message: 'User not found'
+      message: 'User restored'
     });
-  res.json({
-    status: res.statusCode,
-    message: 'User restored'
-  });
-});
+  }
+);
 
 export const profile: RequestHandler = catchAsync(
-  async (req: VerifyRefreshToken, res) => {
+  async (req: CustomRequest, res) => {
     const id = req.id;
     const profile = await UserSchema.findById(id);
     if (profile === null)
@@ -113,57 +125,26 @@ export const profile: RequestHandler = catchAsync(
         status: res.statusCode,
         message: 'User not found'
       });
-    if (profile.rol === userRoles.Admin) {
-      const adminUser = await AdminSchema.findOne({ email: profile.email })
-        .select('-password -__v -createdAt -updatedAt')
-        .populate({
-          path: 'countryId',
-          select: 'name -_id'
-        })
-        .populate({
-          path: 'cityId',
-          select: 'name -_id'
-        });
-      return res.json({
-        status: res.statusCode,
-        userId: profile._id,
-        rol: profile.rol,
-        data: adminUser
-      });
-    } else if (profile.rol === userRoles.Client) {
-      const clientUser = await ClientSchema.findOne({ email: profile.email })
-        .select('-password -__v -createdAt -updatedAt')
-        .populate({
-          path: 'countryId',
-          select: 'name -_id'
-        })
-        .populate({
-          path: 'cityId',
-          select: 'name -_id'
-        });
-      return res.json({
-        status: res.statusCode,
-        userId: profile._id,
-        rol: profile.rol,
-        data: clientUser
-      });
-    } else if (profile.rol === userRoles.Seller) {
-      const sellerUser = await SellerSchema.findOne({ email: profile.email })
-        .select('-password -__v -createdAt -updatedAt')
-        .populate({
-          path: 'countryId',
-          select: 'name -_id'
-        })
-        .populate({
-          path: 'cityId',
-          select: 'name -_id'
-        });
-      return res.json({
-        status: res.statusCode,
-        userId: profile._id,
-        rol: profile.rol,
-        data: sellerUser
-      });
+
+    let user;
+
+    switch (profile.rol) {
+      case ROLES.Admin:
+        user = await getAdminUser(profile.email);
+        break;
+      case ROLES.Client:
+        user = await getClientUser(profile.email);
+        break;
+      case ROLES.Seller:
+        user = await getSellerUser(profile.email);
+        break;
     }
+
+    return res.json({
+      status: res.statusCode,
+      userId: profile._id,
+      rol: profile.rol,
+      data: user
+    });
   }
 );

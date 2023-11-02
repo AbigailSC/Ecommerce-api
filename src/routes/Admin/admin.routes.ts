@@ -10,7 +10,7 @@ import {
 
 import { verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 import { verifyPhone } from '@validations';
 
@@ -18,12 +18,12 @@ const router = Router();
 
 router
   .route('/')
-  .get(verifyRoles([userRoles.Admin]), getAdmins)
-  .post([verifyRoles([userRoles.Admin]), verifyPhone()], createAdmin);
+  .get(verifyRoles([ROLES.Admin]), getAdmins)
+  .post([verifyRoles([ROLES.Admin]), verifyPhone()], createAdmin);
 router
   .route('/:id')
-  .get([verifyRoles([userRoles.Admin])], getAdminById)
-  .put([verifyRoles([userRoles.Admin]), verifyPhone()], updateAdmin)
-  .delete([verifyRoles([userRoles.Admin])], deleteAdmin);
+  .get([verifyRoles([ROLES.Admin])], getAdminById)
+  .put([verifyRoles([ROLES.Admin]), verifyPhone()], updateAdmin)
+  .delete([verifyRoles([ROLES.Admin])], deleteAdmin);
 
 export default router;

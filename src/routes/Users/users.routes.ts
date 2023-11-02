@@ -10,9 +10,14 @@ import {
   profile
 } from '@controllers';
 
-import { recolectErrors, verifyRoles } from '@middleware';
+import {
+  recolectErrors,
+  verifyRefreshToken,
+  verifyRoles,
+  verifyUserIsNotActivated
+} from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 import { check, param } from 'express-validator';
 import { verifyCreate } from '@validations';
@@ -21,25 +26,28 @@ const router: Router = Router();
 
 router
   .route('/')
-  .get([verifyRoles([userRoles.Admin])], getUsers)
-  .post(
-    [
-      verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
-      ...verifyCreate
-    ],
-    createUser
-  );
+  .get(
+    [verifyRefreshToken, verifyUserIsNotActivated, verifyRoles([ROLES.Admin])],
+    getUsers
+  )
+  .post([...verifyCreate, recolectErrors], createUser);
 router
   .route('/profile')
   .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
+    [
+      verifyRefreshToken,
+      verifyUserIsNotActivated,
+      verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller])
+    ],
     profile
   );
 router
   .route('/:id')
   .get(
     [
-      verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
+      verifyRefreshToken,
+      verifyUserIsNotActivated,
+      verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller]),
       param('id', 'Id format invalid').isMongoId(),
       recolectErrors
     ],
@@ -48,7 +56,9 @@ router
   )
   .put(
     [
-      verifyRoles([userRoles.Admin]),
+      verifyRefreshToken,
+      verifyUserIsNotActivated,
+      verifyRoles([ROLES.Admin]),
       param('id', 'Id format invalid').isMongoId(),
       check('password', 'Password is required').not().isEmpty(),
       recolectErrors
@@ -57,7 +67,9 @@ router
   )
   .delete(
     [
-      verifyRoles([userRoles.Admin]),
+      verifyRefreshToken,
+      verifyUserIsNotActivated,
+      verifyRoles([ROLES.Admin]),
       param('id', 'Id format invalid').isMongoId(),
       recolectErrors
     ],
@@ -65,7 +77,9 @@ router
   )
   .patch(
     [
-      verifyRoles([userRoles.Admin]),
+      verifyRefreshToken,
+      verifyUserIsNotActivated,
+      verifyRoles([ROLES.Admin]),
       param('id', 'Id format invalid').isMongoId(),
       recolectErrors
     ],

@@ -55,4 +55,9 @@ const SellerSchema = new Schema(
   }
 );
 
+SellerSchema.methods.toJSON = function () {
+  const { _v, _id, createdAt, updatedAt, ...seller } = this.toObject();
+  return seller;
+};
+
 export default model<SellerType>('seller', SellerSchema);

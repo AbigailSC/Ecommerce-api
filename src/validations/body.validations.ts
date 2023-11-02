@@ -11,7 +11,6 @@ export const verifyCreate = [
     'password',
     'Password should have at least 8 chars, 1 lowercase, 1 uppercase, 1 number, 1 symbol'
   ).isStrongPassword(),
-  check('rol', 'Rol is required').not().isEmpty(),
   (req: Request, res: Response, next: NextFunction) => {
     recolectErrors(req, res, next);
   }

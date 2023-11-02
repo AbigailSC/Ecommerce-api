@@ -10,16 +10,16 @@ import {
 
 import { verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 const router = Router();
 
-router.route('/client').get([verifyRoles([userRoles.Client])], getCartByClient);
-router.route('/').post([verifyRoles([userRoles.Client])], createCart);
+router.route('/client').get([verifyRoles([ROLES.Client])], getCartByClient);
+router.route('/').post([verifyRoles([ROLES.Client])], createCart);
 router
   .route('/:id')
-  .get([verifyRoles([userRoles.Admin, userRoles.Client])], getCart)
-  .put([verifyRoles([userRoles.Client])], updateCart)
-  .delete([verifyRoles([userRoles.Client])], deleteCart);
+  .get([verifyRoles([ROLES.Admin, ROLES.Client])], getCart)
+  .put([verifyRoles([ROLES.Client])], updateCart)
+  .delete([verifyRoles([ROLES.Client])], deleteCart);
 
 export default router;

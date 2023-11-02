@@ -50,4 +50,9 @@ const AdminSchema = new Schema(
   }
 );
 
+AdminSchema.methods.toJSON = function () {
+  const { _v, _id, createdAt, updatedAt, ...admin } = this.toObject();
+  return admin;
+};
+
 export default model<AdminType>('admin', AdminSchema);

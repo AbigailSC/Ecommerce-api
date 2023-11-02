@@ -10,24 +10,24 @@ import {
 
 import { verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 const router = Router();
 
 router
   .route('/')
   .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
+    [verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller])],
     getMethodPayments
   )
-  .post([verifyRoles([userRoles.Admin])], createMethodPayment);
+  .post([verifyRoles([ROLES.Admin])], createMethodPayment);
 router
   .route('/:productId')
   .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
+    [verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller])],
     getMethodPaymentById
   )
-  .put([verifyRoles([userRoles.Admin])], updateMethodPayment)
-  .delete([verifyRoles([userRoles.Admin])], deleteMethodPayment);
+  .put([verifyRoles([ROLES.Admin])], updateMethodPayment)
+  .delete([verifyRoles([ROLES.Admin])], deleteMethodPayment);
 
 export default router;

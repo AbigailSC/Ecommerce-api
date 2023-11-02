@@ -2,25 +2,25 @@ import { Router } from 'express';
 
 import {
   singIn,
-  verify,
+  verifyAccount,
   forgotPassword,
   resetPassword,
-  activateAccount,
+  desactivateAccount,
   logOut,
   refreshToken
 } from '@controllers';
 
 import {
-  verifyTokenActivated,
+  recolectErrors,
   verifyRefreshToken,
-  recolectErrors
+  verifyUserIsAlreadyVerified
 } from '@middleware';
 
 import { check } from 'express-validator';
 
 const router = Router();
 
-router.route('/verify/:id').get(verify); // verificamos para obtener el token para recien poder activar la cuenta
+router.route('/verify').get([verifyUserIsAlreadyVerified], verifyAccount); // ? verificamos para obtener el token para recien poder activar la cuenta, tal vez no es necesario, deberia crear la cuenta y luego verificarla desde el email, cambiar esto a una funcion
 router
   .route('/signin')
   .post(
@@ -31,30 +31,21 @@ router
     ],
     singIn
   );
-router.put('/activate/:id', [verifyTokenActivated], activateAccount);
+router.put('/desactivate/:id', desactivateAccount); // Activar cuenta baneada o inactiva
 router
   .route('/forgot-password')
   .put(
-    [
-      verifyRefreshToken,
-      check('email', 'Email is required').not().isEmpty(),
-      recolectErrors
-    ],
+    [check('email', 'Email is required').not().isEmpty(), recolectErrors],
     forgotPassword
   );
-router
-  .route('/reset-password')
-  .put(
-    [
-      verifyRefreshToken,
-      check('resetPasswordTokenLink', 'Token Password is required')
-        .not()
-        .isEmpty(),
-      check('newPassword', 'New Password is required').not().isEmpty(),
-      recolectErrors
-    ],
-    resetPassword
-  );
+router.route('/reset-password').put(
+  [
+    verifyRefreshToken, //! maybe not needed the token? si reseteo la pass es porque no puedo loguearme
+    check('newPassword', 'New Password is required').not().isEmpty(),
+    recolectErrors
+  ],
+  resetPassword
+);
 // router.route('/activate/:id').put([verifyTokenActivated], activateAccount); // ! This is not used
 router.route('/logout').get([verifyRefreshToken], logOut);
 router.route('/refresh-token').get([verifyRefreshToken], refreshToken);

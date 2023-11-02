@@ -1,17 +1,10 @@
 import { RequestHandler } from 'express';
-import { validationResult } from 'express-validator';
 
-import {
-  AdminSchema,
-  CitySchema,
-  CountrySchema,
-  RolSchema,
-  UserSchema
-} from '@models';
+import { AdminSchema, CitySchema, CountrySchema, UserSchema } from '@models';
 
 import { catchAsync } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 export const getAdmins: RequestHandler = catchAsync(async (_req, res) => {
   const adminsDb = await AdminSchema.find()
@@ -56,16 +49,22 @@ export const createAdmin: RequestHandler = catchAsync(async (req, res) => {
       status: res.statusCode,
       message: 'Admin already exists'
     });
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
 
   const newAdmin = new AdminSchema(data);
   await newAdmin.save();
-  const rol = await RolSchema.findOne({ name: userRoles.Admin });
+
+  const adminKey = req.headers['admin-key'] as string;
+
+  if (adminKey === undefined) {
+    return res.status(400).json({
+      status: res.statusCode,
+      message: 'Admin key is required'
+    });
+  }
+
   const newUser = new UserSchema({
     email: data.email,
-    rol: rol?.name
+    rol: ROLES.Admin
   });
   await newUser.save();
   return res.status(201).json({
@@ -78,9 +77,6 @@ export const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { name, lastname, phone, document, countryId, cityId, image } =
     req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty())
-    return res.status(400).json({ errors: errors.array() });
   await AdminSchema.findByIdAndUpdate(id, {
     name,
     lastname,

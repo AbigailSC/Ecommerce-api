@@ -56,4 +56,9 @@ const clientSchema = new Schema(
   }
 );
 
+clientSchema.methods.toJSON = function () {
+  const { _v, _id, createdAt, updatedAt, ...client } = this.toObject();
+  return client;
+};
+
 export default model<ClientType>('client', clientSchema);

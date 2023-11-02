@@ -10,31 +10,25 @@ import {
 
 import { recolectErrors, verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 import { verifyIdParam, verifyName } from '@validations';
 
 const router = Router();
 
 router
   .route('/')
-  .get(
-    [verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller])],
-    getCategories
-  )
-  .post([verifyRoles([userRoles.Admin]), ...verifyName], createCategory);
+  .get([verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller])], getCategories)
+  .post([verifyRoles([ROLES.Admin]), ...verifyName], createCategory);
 router
   .route('/:id')
   .get(
-    [
-      verifyRoles([userRoles.Admin, userRoles.Client, userRoles.Seller]),
-      ...verifyIdParam
-    ],
+    [verifyRoles([ROLES.Admin, ROLES.Client, ROLES.Seller]), ...verifyIdParam],
     getCategoryById
   )
   .put(
-    [verifyRoles([userRoles.Admin]), ...verifyName, recolectErrors],
+    [verifyRoles([ROLES.Admin]), ...verifyName, recolectErrors],
     updateCategory
   )
-  .delete([verifyRoles([userRoles.Admin])], deleteCategory);
+  .delete([verifyRoles([ROLES.Admin])], deleteCategory);
 // uwu
 export default router;

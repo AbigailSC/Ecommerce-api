@@ -1,30 +1,30 @@
-import { DecodedToken } from './auth.middleware';
-import jwt from 'jsonwebtoken';
-import { NextFunction, Request, Response } from 'express';
-import { config, logger } from '@config';
+import { NextFunction, Response } from 'express';
+import { logger, config } from '@config';
+import { JwtPayload, verify } from 'jsonwebtoken';
+import { CustomRequest } from '@interfaces';
 
-export interface VerifyRefreshToken extends Request {
-  id?: string;
-}
-
-export const verifyRefreshToken = (
-  req: VerifyRefreshToken,
-  _res: Response,
+export const verifyRefreshToken = async (
+  req: CustomRequest,
+  res: Response,
   next: NextFunction
-): void => {
-  const { refreshToken } = req.cookies;
-
+): Promise<void | Response> => {
+  const cookie = req.cookies.refreshToken;
   try {
-    if (refreshToken === undefined)
-      throw new Error('No refresh token provided');
-    const { id } = jwt.verify(
-      refreshToken,
-      config.auth.jwtRefresh
-    ) as DecodedToken;
-    req.id = id;
+    if (cookie === undefined) {
+      return res.status(401).json({
+        status: res.statusCode,
+        message: 'Access denied, cookie not found'
+      });
+    }
+    const payload = verify(cookie, config.auth.jwtSecret) as JwtPayload;
+    req.id = payload.id;
+
     next();
   } catch (error) {
     logger.error((error as Error).message);
-    throw new Error('Access denied, you re not Logged In');
+    return res.status(401).json({
+      status: res.statusCode,
+      message: 'Access denied, you re not Logged In'
+    });
   }
 };

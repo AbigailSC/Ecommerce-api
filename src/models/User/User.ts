@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import { UserType } from '@interfaces';
+import { ROLES } from '@constants';
 
 const usersSchema = new Schema(
   {
@@ -17,7 +18,8 @@ const usersSchema = new Schema(
     },
     rol: {
       type: String,
-      required: true
+      required: false,
+      default: ROLES.Client
     },
     verified: {
       type: Boolean,
@@ -59,7 +61,15 @@ usersSchema.methods.comparePassword = async function (
   return await bcrypt.compare(candidatePassword, this.password);
 };
 usersSchema.methods.toJSON = function () {
-  const { _v, password, _id, emailVerifyTokenLink, ...user } = this.toObject();
+  const {
+    _v,
+    password,
+    _id,
+    emailVerifyTokenLink,
+    createdAt,
+    updatedAt,
+    ...user
+  } = this.toObject();
   return user;
 };
 

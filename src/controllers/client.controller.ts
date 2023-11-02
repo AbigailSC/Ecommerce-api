@@ -2,13 +2,12 @@ import { RequestHandler } from 'express';
 
 import { sendEmail } from '@config';
 
-import { ClientSchema, RolSchema, UserSchema } from '@models';
+import { ClientSchema, UserSchema } from '@models';
 
 import {
   getActivationTemplate,
   getDuplicateMsg,
-  getMessageByRole,
-  userRoles
+  getMessageByRole
 } from '@utils';
 
 import { catchAsync } from '@middleware';
@@ -52,10 +51,8 @@ export const createClient: RequestHandler = catchAsync(async (req, res) => {
     });
   const newClient = new ClientSchema(data);
   await newClient.save();
-  const rol = await RolSchema.findOne({ name: userRoles.Client });
   const newUser = new UserSchema({
-    email: data.email,
-    rol: rol?.name
+    email: data.email
   });
   await newUser.save();
   await sendEmail(

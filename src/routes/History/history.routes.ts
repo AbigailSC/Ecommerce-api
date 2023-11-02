@@ -10,18 +10,18 @@ import {
 
 import { verifyRoles } from '@middleware';
 
-import { userRoles } from '@utils';
+import { ROLES } from '@constants';
 
 const router = Router();
 
 router
   .route('/')
-  .get([verifyRoles([userRoles.Admin])], getHistory)
-  .post([verifyRoles([userRoles.Client])], createHistory);
+  .get([verifyRoles([ROLES.Admin])], getHistory)
+  .post([verifyRoles([ROLES.Client])], createHistory);
 router
   .route('/:id')
-  .get([verifyRoles([userRoles.Admin, userRoles.Client])], getHistoryById)
-  .put([verifyRoles([userRoles.Client])], updateHistory)
-  .delete([verifyRoles([userRoles.Client])], deleteHistory);
+  .get([verifyRoles([ROLES.Admin, ROLES.Client])], getHistoryById)
+  .put([verifyRoles([ROLES.Client])], updateHistory)
+  .delete([verifyRoles([ROLES.Client])], deleteHistory);
 
 export default router;
