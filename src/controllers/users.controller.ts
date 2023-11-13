@@ -11,6 +11,9 @@ import { generateToken } from '@config';
 
 export const createUser: RequestHandler = catchAsync(async (req, res) => {
   const { email, password }: UserType = req.body;
+  const sellerKey = req.headers['seller-key'] as string;
+  const adminKey = req.headers['admin-key'] as string;
+
   const newUser = new UserSchema({
     email
   });
@@ -18,12 +21,10 @@ export const createUser: RequestHandler = catchAsync(async (req, res) => {
   const token = await generateToken(newUser.id);
   newUser.emailVerifyTokenLink = token;
 
-  const sellerKey = req.headers['seller-key'] as string;
   if (sellerKey) {
     newUser.rol = ROLES.Seller;
   }
 
-  const adminKey = req.headers['admin-key'] as string;
   if (adminKey) {
     newUser.rol = ROLES.Admin;
   }
