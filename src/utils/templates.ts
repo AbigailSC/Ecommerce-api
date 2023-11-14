@@ -1,3 +1,3 @@
 export const getActivationTemplate = (refreshToken: string): string => {
-  return `<a>${refreshToken}</a>`;
+  return `<a href='${refreshToken}'>Confirmar cuenta</a>`;
 };

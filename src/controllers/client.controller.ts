@@ -11,6 +11,7 @@ import {
 } from '@utils';
 
 import { catchAsync } from '@middleware';
+import { UserType } from '@interfaces';
 
 export const getClients: RequestHandler = catchAsync(async (_req, res) => {
   const clientsDb = await ClientSchema.find()
@@ -51,7 +52,7 @@ export const createClient: RequestHandler = catchAsync(async (req, res) => {
     });
   const newClient = new ClientSchema(data);
   await newClient.save();
-  const newUser = new UserSchema({
+  const newUser: UserType = new UserSchema({
     email: data.email
   });
   await newUser.save();
